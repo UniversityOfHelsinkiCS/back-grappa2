@@ -1,4 +1,4 @@
-class thesis {
+export class Thesis {
     constructor(id, authorFirstname, authorLastname, authorEmail, title, urkund, grade, graderEval, studyFieldId, userId) {
         //couple of fields missing atm
         this.id = id;
@@ -12,6 +12,4 @@ class thesis {
         this.studyFieldId = studyFieldId;
         this.userId = userId;
     }
-
-
 }

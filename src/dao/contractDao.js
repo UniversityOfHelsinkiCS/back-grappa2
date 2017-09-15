@@ -1,5 +1,10 @@
 export const getContract = () => {
-    return "Hola";
+    const mockContract = {
+        completionEta: 'This is',
+        supervision: 'an example of',
+        misc: 'contract data'
+    };
+    return mockContract;
 }
 
 export const saveContract = (data) => {

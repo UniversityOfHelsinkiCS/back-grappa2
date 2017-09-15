@@ -1,17 +1,13 @@
 require('babel-polyfill');
-const contractDao = require('../dao/contractDao');
-const express = require('express');
-const app = express();
 const output = require('../output');
+const contractDao = require('../dao/contractDao');
 
-module.exports = app;
-
-export function getterContract(req, res)  {
-    console.log("get onnistuu");
+export function getContract(req, res) {
+    output.send(req.query.outputType, res.status(200), contractDao.getContract());
 }
 
-export function contract(req, res) {
+export function saveContract(req, res) {
     console.log(req.body);
     contractDao.saveContract(req.body);
-    output.send(req.query.outputType, res.status(200), "ok");
+    output.send(req.query.outputType, res.status(200), "saveContract function called.");
 }

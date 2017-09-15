@@ -33,4 +33,4 @@ export const send = (outputType, res, outputContent) => {
             jsonOut(res,outputContent);
             break;
     }
-} 
+}

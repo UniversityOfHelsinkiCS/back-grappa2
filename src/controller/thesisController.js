@@ -1,11 +1,7 @@
 require('babel-polyfill');
+const output = require('../output');
 const thesisDao = require('../dao/thesisDao');
-const express = require('express');
-const app = express();
-const output = require('./src/output');
 
-module.exports = app;
-
-app.get('/theses',  (req, res) => {
+export function getTheses(req, res) {
   output.send(req.query.outputType, res, thesisDao.getTheses());
-})
+}
