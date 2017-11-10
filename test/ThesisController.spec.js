@@ -51,7 +51,7 @@ test.cb('getAllTheses returns correct information', t => {
     service.getAllTheses.restore();
 });
 
-test.cb('saveAgreement works from controller', t => {
+test.cb.only('saveAgreement returns 500 if there no database ', t => {
     const body ={
         thesisTitle: 'Annin Grady',
         urkund: 'http://',
@@ -62,7 +62,8 @@ test.cb('saveAgreement works from controller', t => {
     req.body = body;
     thesisController.saveThesis(req, res)
         .then(() => {
-            t.is(res.status.calledWith(200), true, "saveThesis returns status 200 for new thesis");
+            console.log("RES THEN" + JSON.stringify(res));
+            t.is(res.status.calledWith(500), true, "saveThesis returns status 500 if no database");
             t.end();
         });
 });

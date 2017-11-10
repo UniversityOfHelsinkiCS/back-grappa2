@@ -15,10 +15,12 @@ export async function getThesisById(req, res) {
 
 export async function saveThesis(req, res) {
     const thesisData = req.body;
-        try {
-            const daoResponse = await thesisService.saveThesis(thesisData);
-            res.status(200).json({ text: "agreement update successful", agreementId: daoResponse });
-        } catch (err) {
-            res.status(500).json({ text: "error occurred", error: err });
-        }
+    thesisService.saveThesis(thesisData).then((response) =>  {
+        res.status(200).json("Thesis saved succesfully " + response);
+    }
+    ).catch(err => {
+        res.status(500).json("Error occured when saving theses ");
+    });
 }
+
+

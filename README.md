@@ -3,7 +3,9 @@
 Ohjelmistotuotantoprojekti (Software lab), autumn 2017
 University of Helsinki
 
-Documentation of the project can be found in our [front end](https://github.com/OhtuGrappa2/front-grappa2)
+[Front end](https://github.com/OhtuGrappa2/front-grappa2)
+
+[Documentation](https://drive.google.com/drive/folders/0B5AboURQNTdya2xJcC0zVmVDM1E)
 
 Grappa 2.0 (GRAdut Pikaisesti PAkettiin 2.0) will be a tool for both students and staff to manage master theses, to simplify and to speed up the whole thesis process. Made for the Helsinki University's department of Computer Science and licensed under MIT.
 

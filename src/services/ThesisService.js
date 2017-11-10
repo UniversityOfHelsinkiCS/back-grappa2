@@ -21,11 +21,12 @@ export const getThesisById = (id) => {
 }
 
 export const saveThesis = (data) => {
+    console.log("saveThesis servicessä hoi");
     return knex('thesis')
     .returning('thesisId')
     .insert(data)
     .then(thesisId => thesisId[0])
-    .catch(err => err);
+    .catch(err => Promise.reject(err));
 }
 
 export async function updateThesis(thesisData) {
