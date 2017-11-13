@@ -7,7 +7,7 @@ exports.seed = function (knex, Promise) {
               {
                   personId: 1,
                   shibbolethId: 'zippoletid1',
-                  email: 'first.last@gmail.com',
+                  email: 'grappasupervisor@mailinator.com',
                   title: 'Dr.',
                   firstname: 'Supervisor',
                   lastname: 'Lastname',
@@ -20,7 +20,7 @@ exports.seed = function (knex, Promise) {
               {
                   personId: 2,
                   shibbolethId: 'zippoletid2',
-                  email: 'olavi.uusivirta@gmail.com',
+                  email: 'grappaprofessor@mailinator.com',
                   title: 'Prof.',
                   firstname: 'Olavi',
                   lastname: 'Uusivirta',
@@ -45,7 +45,7 @@ exports.seed = function (knex, Promise) {
               },
               {
                   personId: 4,
-                  shibbolethId: 'zippoletid',
+                  shibbolethId: 'zippoletid4',
                   email: 'retired.person@gmail.com',
                   title: 'Ms',
                   firstname: 'Retired',
@@ -55,6 +55,19 @@ exports.seed = function (knex, Promise) {
                   address: ('Mannerheimintie'),
                   phone: '050 1234567',
                   major: 'geologiaa'
+              },
+              {
+                  personId: 5,
+                  shibbolethId: 'zippoletid5',
+                  email: 'grappastudent@mailinator.com',
+                  title: 'Mr',
+                  firstname: 'Student',
+                  lastname: 'Person',
+                  isRetired: false,
+                  studentNumber: ('87654321'),
+                  address: ('Intiankatu'),
+                  phone: '050 1234567',
+                  major: 'mathematics'
               }
           ]);
       });

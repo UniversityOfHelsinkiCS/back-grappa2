@@ -93,7 +93,7 @@ test.serial('saveNewAgreement call returns agreementId = 4', async t => {
 
 
     var temp = await agreementService.saveNewAgreement(testData);
-    console.log(temp);
+    //console.log(temp);
     t.truthy(temp == 4);
     /*
     await knex('agreement')

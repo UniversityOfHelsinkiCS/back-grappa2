@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test nyc ava -s",
-    "start": "nodemon index.js",
+    "start": "NODE_ENV=dev TEST_MAIL=grabbarobot EMAIL_HOST=gmail.com MAIL_PSWD=grabbasalasana nodemon index.js",
     "start:prod": "node index.js",
     "build": "BABEL_ENV=production babel --out-dir=dist index.js",
     "report": "nyc report --reporter=html",
@@ -28,6 +28,7 @@
     "busboy": "^0.2.14",
     "express": "^4.15.4",
     "knex": "^0.13.0",
+    "nodemailer": "^4.3.1",
     "pg": "^7.3.0",
     "sqlite3": "^3.1.12"
   },

@@ -2,6 +2,7 @@ require('babel-polyfill');
 const agreementService = require('../services/AgreementService');
 const personService = require('../services/PersonService');
 const thesisService = require('../services/ThesisService');
+const emailService = require('../services/EmailService');
 const express = require('express');
 const app = express();
 
@@ -22,10 +23,14 @@ export async function getAllAgreements(req, res) {
 }
 
 export async function saveAgreement(req, res) {
+    console.log("saveAgreement");
     const data = req.body;
     if (data.agreementId === "" || data.agreementId == null) {
         try {
-            const personData = {
+            //REMOVE THIS WHEN AGREEMENT SAVE WORKS
+            data.personId = 1;
+            data.thesisSupervisorMain = 1;
+            /*const personData = {
                 personId: data.personId,
                 firstname: data.studentFirstName,
                 lastname: data.studentLastName,
@@ -53,7 +58,8 @@ export async function saveAgreement(req, res) {
                 meetingAgreement: data.thesisWorkMeetingAgreement,
                 other: data.thesisWorkOther
             };
-            const agreementId = await agreementService.saveNewAgreement(agreementData);
+            const agreementId = await agreementService.saveNewAgreement(agreementData);*/
+            emailService.agreementCreated(data);
             res.status(200).json({ text: "agreement save successfull(/SQL error)", agreementId: agreementId });
         } catch (err) {
             res.status(500).json({ text: "error occurred", error: err });
@@ -103,6 +109,7 @@ export async function updateAgreement(req, res) {
             };
             const cleanAgreementData = removeUselessKeys(agreementData);
             const agreementResponse = await agreementService.updateAgreement(cleanAgreementData);
+            emailService.agreementUpdated(data);
             res.status(200).json({ text: "agreement update successfull(/SQL error)", agreementId: agreementId });
         } catch (err) {
             res.status(500).json({ text: "error occurred", error: err });
