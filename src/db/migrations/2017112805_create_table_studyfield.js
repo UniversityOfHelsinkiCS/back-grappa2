@@ -5,6 +5,7 @@ exports.up = function(knex, Promise) {
             table.integer('facultyId').unsigned();
             table.foreign('facultyId').references('faculty.facultyId');
             table.string('name');
+            table.string('thesisGradingInfo');
             table.timestamps();
         })
     ]);

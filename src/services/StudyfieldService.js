@@ -3,7 +3,8 @@ const knex = require('../db/connection');
 const studyfieldSchema = [
     'studyfieldId',
     'name',
-    'facultyId'
+    'facultyId',
+    'thesisGradingInfo'
 ]
 
 export const getAllStudyfields = () => {
