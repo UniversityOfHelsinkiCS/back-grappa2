@@ -13,6 +13,7 @@ const studyfieldService = require('../services/StudyfieldService')
 const notificationService = require('../services/NotificationService')
 const emailService = require('../services/EmailService')
 const emailInviteService = require('../services/EmailInviteService')
+const oldGraduDbService = require('../services/OldGraduDbService')
 
 const knex = require('../db/connection').getKnex()
 
@@ -117,7 +118,7 @@ export async function saveThesisForm(req, res) {
         savedAgreement.email = authorEmail
 
         await notificationService.createNotification('THESIS_SAVE_ONE_SUCCESS', req, agreement.programmeId)
-        
+
         return {
             thesisId: savedThesis.thesisId,
             agreement: savedAgreement,
@@ -200,6 +201,7 @@ const updateGraders = async (graders, agreement, trx) => {
 export async function markPrinted(req, res) {
     if (await permissionService.checkUserHasRightToPrint(req)) {
         await thesisService.markPrinted(req.body)
+        await oldGraduDbService.exportThesisToOldDb(req.body)
         res.status(200).json(req.body)
     } else {
         res.status(403).json({ error: 'no dice boy' })

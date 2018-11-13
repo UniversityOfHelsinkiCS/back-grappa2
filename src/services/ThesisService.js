@@ -64,9 +64,7 @@ export const getThesesByAgreementPerson = async (personId) => {
     return getAuthorsSupervisorsGraders(agreementPersonsTheses)
 }
 
-export const getThesisById = async (thesisId) => {
-    return getThesisWithRelated(thesisId)
-}
+export const getThesisById = async thesisId => getThesisWithRelated(thesisId)
 
 export const saveThesis = async (thesis, trx) => {
     const thesisIds = await knex('thesis')

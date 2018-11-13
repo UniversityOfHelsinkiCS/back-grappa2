@@ -17,6 +17,12 @@ Dependencies: [![Known Vulnerabilities](https://snyk.io/test/github/UniversityOf
 
 # Installation
 
+## Oracle
+CS theses info is also stored to old Oracle database. Because enterpri$e, you just cant npm install
+oracle driver. You must download and install some files manually: [instructions](hhttps://oracle.github.io/node-oracledb/INSTALL.html#-2-quick-start-node-oracledb-installation)
+
+TL;DR; Download oracle libs to `~/lib`
+
 ## Database
 Install docker & docker-compose:
 
