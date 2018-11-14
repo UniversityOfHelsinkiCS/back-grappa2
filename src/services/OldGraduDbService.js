@@ -2,6 +2,18 @@ const Promise = require('bluebird')
 const oracleKnex = require('../db/connection').getOracleKnex()
 const knex = require('../db/connection').getKnex()
 
+const gradeMap = {
+    Approbatur: '09. a',
+    'Lubenter Approbatur': '08. lub',
+    'Non Sine Laude Approbatur': '07. nsla',
+    'Cum Laude Approbatur': '06. cl',
+    'Magna Cum Laude Approbatur': '05. mcl',
+    'Eximia Cum Laude Approbatur': '04. ecl',
+    Laudatur: '03. l'
+}
+
+const createTransaction = () => new Promise(resolve => oracleKnex.transaction(resolve))
+
 const agreementsToExport = async (thesisIds) => {
     const studyfieldsToExport = knex('studyfield')
         .select('studyfieldId')
@@ -48,9 +60,25 @@ const getDataToExport = async (thesisIds) => {
 const exportThesisData = async (thesisData) => {
     try {
         const thesisRow = await getThesisRow(thesisData)
-        console.log(thesisRow)
+        const trx = await createTransaction()
+
+        await updateIfMissing(trx, 'ARVOSANA', thesisRow, gradeMap[thesisData.grade] || thesisData.grade)
+        await updateIfMissing(trx, 'VAHVISTUSPVM', thesisRow, thesisData.councilMeeting)
+
+        await trx.commit()
     } catch (err) {
         console.log(err)
+    }
+}
+
+const updateIfMissing = async (trx, field, thesisRow, value) => {
+    if (!thesisRow.ARVOSANA) {
+        const update = {}
+        update[field] = value
+
+        await trx('GRADU.GRADU')
+            .where('TUNNUS', thesisRow.TUNNUS)
+            .update(update)
     }
 }
 
@@ -69,8 +97,6 @@ const getThesisRow = async (thesisData) => {
 
     return thesisFromOldDb
 }
-
-const createTransaction = () => new Promise(resolve => oracleKnex.transaction(resolve))
 
 const insertNewThesisToDB = async (thesisData) => {
     const trx = await createTransaction()

@@ -8,6 +8,7 @@ const OldGraduDbService = require('../../src/services/OldGraduDbService')
 
 test.before(async () => {
     await initDb()
+    await oracleKnex('GRADU').where('OTSAKE', 'Hieno Gradu').delete()
 })
 
 test('Fetch agreements for theses', async (t) => {
