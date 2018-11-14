@@ -23,6 +23,8 @@ oracle driver. You must download and install some files manually: [instructions]
 
 TL;DR; Download oracle libs to `~/lib`
 
+Make sure that your `hostname` is set to `/etc/hosts`. Otherwise you will get `ORA-24454` error.
+
 ## Database
 Install docker & docker-compose:
 
