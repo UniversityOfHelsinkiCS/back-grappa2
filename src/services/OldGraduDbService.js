@@ -1,8 +1,9 @@
 const Promise = require('bluebird')
+
 const oracleKnex = require('../db/connection').getOracleKnex()
 const knex = require('../db/connection').getKnex()
 
-const gradeMap = {
+const GRADE_MAP = {
     Approbatur: '09. a',
     'Lubenter Approbatur': '08. lub',
     'Non Sine Laude Approbatur': '07. nsla',
@@ -39,7 +40,8 @@ const getThesisDataToExport = async (agreement) => {
         thesisTitle: thesis.title,
         grade: thesis.grade,
         councilMeeting: councilMeeting.date,
-        graders
+        graders,
+        studyfield: agreement.studyfieldId
     }
 }
 
@@ -62,8 +64,10 @@ const exportThesisData = async (thesisData) => {
         const thesisRow = await getThesisRow(thesisData)
         const trx = await createTransaction()
 
-        await updateIfMissing(trx, 'ARVOSANA', thesisRow, gradeMap[thesisData.grade] || thesisData.grade)
+        await updateIfMissing(trx, 'ARVOSANA', thesisRow, GRADE_MAP[thesisData.grade] || thesisData.grade)
         await updateIfMissing(trx, 'VAHVISTUSPVM', thesisRow, thesisData.councilMeeting)
+        await updateRow(trx, 'TILA', thesisRow, '12. hyväksytty')
+        await updateIfMissing(trx, 'VAHVISTAJALINJA', thesisRow, getStudyfield(thesisData))
 
         await trx.commit()
     } catch (err) {
@@ -71,15 +75,30 @@ const exportThesisData = async (thesisData) => {
     }
 }
 
-const updateIfMissing = async (trx, field, thesisRow, value) => {
-    if (!thesisRow.ARVOSANA) {
-        const update = {}
-        update[field] = value
+const updateRow = (trx, field, thesisRow, value) => {
+    const update = {}
+    update[field] = value
 
-        await trx('GRADU.GRADU')
-            .where('TUNNUS', thesisRow.TUNNUS)
-            .update(update)
+    return trx('GRADU.GRADU')
+        .where('TUNNUS', thesisRow.TUNNUS)
+        .update(update)
+}
+
+const updateIfMissing = async (trx, field, thesisRow, value) => {
+    if (!thesisRow[field]) {
+        await updateRow(trx, field, thesisRow, value)
     }
+}
+
+const getStudyfield = (thesisData) => {
+    const studyfields = {
+        1: 'oja',
+        2: 'alko',
+        3: 'haja',
+        4: 'algbio'
+    }
+
+    return studyfields[thesisData.studyfield]
 }
 
 const getThesisRow = async (thesisData) => {
