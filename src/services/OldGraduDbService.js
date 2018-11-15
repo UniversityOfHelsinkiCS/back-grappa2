@@ -47,8 +47,6 @@ const getThesisDataToExport = async (agreement) => {
 
 module.exports.exportThesisToOldDb = async (thesisIds) => {
     const dataToExport = await getDataToExport(thesisIds)
-
-    console.log(dataToExport)
     await exportThesisData(dataToExport[0])
 }
 
@@ -61,13 +59,16 @@ const getDataToExport = async (thesisIds) => {
 
 const exportThesisData = async (thesisData) => {
     try {
-        const thesisRow = await getThesisRow(thesisData)
         const trx = await createTransaction()
+        const thesisRow = await getThesisRow(trx, thesisData)
+        const mainGrader = await getPersonId(trx, thesisData.graders[0])
 
         await updateIfMissing(trx, 'ARVOSANA', thesisRow, GRADE_MAP[thesisData.grade] || thesisData.grade)
         await updateIfMissing(trx, 'VAHVISTUSPVM', thesisRow, thesisData.councilMeeting)
         await updateRow(trx, 'TILA', thesisRow, '12. hyväksytty')
         await updateIfMissing(trx, 'VAHVISTAJALINJA', thesisRow, getStudyfield(thesisData))
+        await updateIfMissing(trx, 'VALMISTELIJA', thesisRow, mainGrader)
+        await updateIfMissing(trx, 'VAHVISTAJA', thesisRow, mainGrader)
 
         await trx.commit()
     } catch (err) {
@@ -101,15 +102,41 @@ const getStudyfield = (thesisData) => {
     return studyfields[thesisData.studyfield]
 }
 
-const getThesisRow = async (thesisData) => {
-    const thesisFromOldDb = await oracleKnex('GRADU.GRADU')
+const getPersonId = async (trx, person) => {
+    const dbPerson = await trx('GRADU.OHJAAJA')
+        .where('SUKUNIMI', person.lastname)
+        .andWhere('ETUNIMI', person.firstname)
+        .first()
+
+    if (dbPerson) {
+        return dbPerson.KTUNNUS
+    }
+
+    return insertPerson(trx, person)
+}
+
+const insertPerson = async (trx, person) => {
+    const personId = await trx.raw('select GRADU.OTUNNUS.NEXTVAL from dual')
+
+    await trx('GRADU.OHJAAJA')
+        .insert({
+            KTUNNUS: personId[0].NEXTVAL,
+            SUKUNIMI: person.lastname,
+            ETUNIMI: person.firstname
+        })
+
+    return personId[0].NEXTVAL
+}
+
+const getThesisRow = async (trx, thesisData) => {
+    const thesisFromOldDb = await trx('GRADU.GRADU')
         .where('TEKIJA', thesisData.author.studentNumber)
         .first()
 
     if (!thesisFromOldDb) {
-        await insertNewThesisToDB(thesisData)
+        await insertNewThesisToDB(trx, thesisData)
 
-        return oracleKnex('GRADU.GRADU')
+        return trx('GRADU.GRADU')
             .where('TEKIJA', thesisData.author.studentNumber)
             .first()
     }
@@ -117,8 +144,7 @@ const getThesisRow = async (thesisData) => {
     return thesisFromOldDb
 }
 
-const insertNewThesisToDB = async (thesisData) => {
-    const trx = await createTransaction()
+const insertNewThesisToDB = async (trx, thesisData) => {
     const thesisId = await trx.raw('select GRADU.GTUNNUS.NEXTVAL from dual')
     const thesisRow = {
         TUNNUS: thesisId[0].NEXTVAL,
@@ -129,7 +155,4 @@ const insertNewThesisToDB = async (thesisData) => {
     }
 
     await trx('GRADU.GRADU').insert(thesisRow)
-    await trx.commit()
 }
-
-module.exports.getDataToExport = getDataToExport

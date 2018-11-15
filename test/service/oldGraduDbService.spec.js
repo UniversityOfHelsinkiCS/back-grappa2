@@ -9,12 +9,7 @@ const OldGraduDbService = require('../../src/services/OldGraduDbService')
 test.before(async () => {
     await initDb()
     await oracleKnex('GRADU').where('OTSAKE', 'Hieno Gradu').delete()
-})
-
-test('Fetch agreements for theses', async (t) => {
-    const agreements = await OldGraduDbService.getDataToExport([2])
-
-    t.is(agreements.length, 1)
+    await oracleKnex('OHJAAJA').where('SUKUNIMI', 'CS-Hallinto').delete()
 })
 
 const thesisCount = () => oracleKnex('GRADU.GRADU').count().first()
