@@ -80,3 +80,5 @@ back-grappa2.iml
 
 import/
 apidoc/
+
+*.zip
