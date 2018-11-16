@@ -9,12 +9,12 @@ RUN mkdir -p /usr/src/app
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-# Update & install pdftk
-RUN apt-get update
-RUN apt-get install -y pdftk
+# Update & install pdftk, libaio1, unzip
+RUN apt-get update && apt-get install -y pdftk libaio1 libaio-dev unzip
 
 RUN npm i;
+RUN chmod 755 entrypoint.sh
 
 EXPOSE 3100
 
-CMD ["npm", "run", "start:prod"]
+ENTRYPOINT ["./entrypoint.sh"]
