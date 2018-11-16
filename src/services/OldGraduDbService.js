@@ -14,11 +14,24 @@ const GRADE_MAP = {
 }
 
 const createTransaction = () => new Promise(resolve => oracleKnex.transaction(resolve))
+const getIdFromSequence = (trx, sequence) => trx.raw('select ??.NEXTVAL from dual', sequence)
+
+module.exports.exportThesisToOldDb = async (thesisIds) => {
+    const dataToExport = await getDataToExport(thesisIds)
+    await Promise.each(dataToExport, exportThesisData)
+}
+
+const getDataToExport = async (thesisIds) => {
+    const agreements = await agreementsToExport(thesisIds)
+    const dataToExport = await Promise.map(agreements, getThesisDataToExport)
+
+    return dataToExport
+}
 
 const agreementsToExport = async (thesisIds) => {
     const studyfieldsToExport = knex('studyfield')
         .select('studyfieldId')
-        .whereIn('programmeId', [1, 5, 8])
+        .whereIn('programmeId', [1, 5])
 
     return knex('agreement')
         .where('studyfieldId', 'in', studyfieldsToExport)
@@ -45,30 +58,19 @@ const getThesisDataToExport = async (agreement) => {
     }
 }
 
-module.exports.exportThesisToOldDb = async (thesisIds) => {
-    const dataToExport = await getDataToExport(thesisIds)
-    await exportThesisData(dataToExport[0])
-}
-
-const getDataToExport = async (thesisIds) => {
-    const agreements = await agreementsToExport(thesisIds)
-    const dataToExport = await Promise.map(agreements, getThesisDataToExport)
-
-    return dataToExport
-}
-
 const exportThesisData = async (thesisData) => {
     try {
         const trx = await createTransaction()
         const thesisRow = await getThesisRow(trx, thesisData)
-        const mainGrader = await getPersonId(trx, thesisData.graders[0])
+        const mainGraderId = await getPersonId(trx, thesisData.graders[0])
 
         await updateIfMissing(trx, 'ARVOSANA', thesisRow, GRADE_MAP[thesisData.grade] || thesisData.grade)
         await updateIfMissing(trx, 'VAHVISTUSPVM', thesisRow, thesisData.councilMeeting)
         await updateRow(trx, 'TILA', thesisRow, '12. hyväksytty')
         await updateIfMissing(trx, 'VAHVISTAJALINJA', thesisRow, getStudyfield(thesisData))
-        await updateIfMissing(trx, 'VALMISTELIJA', thesisRow, mainGrader)
-        await updateIfMissing(trx, 'VAHVISTAJA', thesisRow, mainGrader)
+        await updateIfMissing(trx, 'VALMISTELIJA', thesisRow, mainGraderId)
+        await updateIfMissing(trx, 'VAHVISTAJA', thesisRow, mainGraderId)
+        await updateGraderRow(trx, thesisRow, thesisData, mainGraderId)
 
         await trx.commit()
     } catch (err) {
@@ -80,7 +82,7 @@ const updateRow = (trx, field, thesisRow, value) => {
     const update = {}
     update[field] = value
 
-    return trx('GRADU.GRADU')
+    return trx('GRADU')
         .where('TUNNUS', thesisRow.TUNNUS)
         .update(update)
 }
@@ -103,7 +105,7 @@ const getStudyfield = (thesisData) => {
 }
 
 const getPersonId = async (trx, person) => {
-    const dbPerson = await trx('GRADU.OHJAAJA')
+    const dbPerson = await trx('OHJAAJA')
         .where('SUKUNIMI', person.lastname)
         .andWhere('ETUNIMI', person.firstname)
         .first()
@@ -116,7 +118,7 @@ const getPersonId = async (trx, person) => {
 }
 
 const insertPerson = async (trx, person) => {
-    const personId = await trx.raw('select GRADU.OTUNNUS.NEXTVAL from dual')
+    const personId = await getIdFromSequence(trx, 'OTUNNUS')
 
     await trx('GRADU.OHJAAJA')
         .insert({
@@ -128,15 +130,36 @@ const insertPerson = async (trx, person) => {
     return personId[0].NEXTVAL
 }
 
+const updateGraderRow = async (trx, thesisRow, thesisData, mainGraderId) => {
+    const graderRow = await trx('OHJAUS')
+        .where('GRADUTUNNUS', thesisRow.TUNNUS)
+        .andWhere('OHJAAJATUNNUS', mainGraderId)
+
+    if (graderRow) {
+        return graderRow
+    }
+
+    const gradingId = await getIdFromSequence(trx, 'OTUNNUS')
+
+    return trx('OHJAUS')
+        .insert({
+            OTUNNUS: gradingId[0].NEXTVAL,
+            GRADUTUNNUS: thesisRow.TUNNUS,
+            OHJAAJATUNNUS: mainGraderId,
+            ROOLI: 'pääohjaaja',
+            PAATTYMISAIKA: thesisData.councilMeeting
+        })
+}
+
 const getThesisRow = async (trx, thesisData) => {
-    const thesisFromOldDb = await trx('GRADU.GRADU')
+    const thesisFromOldDb = await trx('GRADU')
         .where('TEKIJA', thesisData.author.studentNumber)
         .first()
 
     if (!thesisFromOldDb) {
         await insertNewThesisToDB(trx, thesisData)
 
-        return trx('GRADU.GRADU')
+        return trx('GRADU')
             .where('TEKIJA', thesisData.author.studentNumber)
             .first()
     }
@@ -145,7 +168,7 @@ const getThesisRow = async (trx, thesisData) => {
 }
 
 const insertNewThesisToDB = async (trx, thesisData) => {
-    const thesisId = await trx.raw('select GRADU.GTUNNUS.NEXTVAL from dual')
+    const thesisId = await getIdFromSequence(trx, 'GTUNNUS')
     const thesisRow = {
         TUNNUS: thesisId[0].NEXTVAL,
         TEKIJA: thesisData.author.studentNumber,
@@ -154,5 +177,5 @@ const insertNewThesisToDB = async (trx, thesisData) => {
         KIRJAUSPVM: thesisData.councilMeeting
     }
 
-    await trx('GRADU.GRADU').insert(thesisRow)
+    await trx('GRADU').insert(thesisRow)
 }

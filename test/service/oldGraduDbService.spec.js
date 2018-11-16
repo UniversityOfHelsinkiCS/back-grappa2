@@ -12,7 +12,7 @@ test.before(async () => {
     await oracleKnex('OHJAAJA').where('SUKUNIMI', 'CS-Hallinto').delete()
 })
 
-const thesisCount = () => oracleKnex('GRADU.GRADU').count().first()
+const thesisCount = () => oracleKnex('GRADU').count().first()
 
 test('Export thesis that has no information on old system', async (t) => {
     const thesisRowsBefore = await thesisCount()
@@ -20,6 +20,8 @@ test('Export thesis that has no information on old system', async (t) => {
     await OldGraduDbService.exportThesisToOldDb([2])
 
     const thesisRowsAfter = await thesisCount()
+    const person = await oracleKnex('OHJAAJA').where('SUKUNIMI', 'CS-Hallinto').first()
 
     t.is(thesisRowsAfter['COUNT(*)'], thesisRowsBefore['COUNT(*)'] + 1)
+    t.not(person, undefined)
 })
