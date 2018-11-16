@@ -13,7 +13,14 @@ before_script:
   - psql -c 'create schema grappa_test;' -U postgres grappa
 
 env:
-  - DATABASE_URL=postgres://postgres@localhost/grappa CONSOLE_OUTPUT=true TOKEN_SECRET=salainen_token
+  - DATABASE_URL=postgres://postgres@localhost/grappa
+  - CONSOLE_OUTPUT=true
+  - TOKEN_SECRET=salainen_token
+  - ETHESIS_USERNAME=username
+  - ETHESIS_PASSWORD=password
+  - ETHESIS_BASE_URL=http://ethesis.base.url
+  - URN_GENERATOR_ADDRESS=http://urn.generator.address
+  - ETHESIS_UPLOAD_CRON="0 23 * * *"
 
 script: npm run test-tap
 
@@ -37,4 +44,3 @@ after_success:
   - "[[ $TRAVIS_TAG =~ (v[1-9].+) ]] && docker build -t toska/back-grappa2:latest ."
   - "[[ $TRAVIS_TAG =~ (v[1-9].+) ]] && docker login -u $DOCKER_USER -p $DOCKER_PASS"
   - "[[ $TRAVIS_TAG =~ (v[1-9].+) ]] && docker push toska/back-grappa2:latest"
-  
