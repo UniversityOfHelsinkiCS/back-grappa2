@@ -74,8 +74,10 @@ const exportThesisData = async (thesisData) => {
         await updateGraderRow(trx, thesisRow, thesisData, mainGraderId)
 
         await trx.commit()
+        logger.info(`Exported thesis ${thesisData.title} to Oracle DB`)
     } catch (err) {
-        logger.error(`Export for thesis ${thesisData.title} to Oracle DB has failed`, { error: err })
+        logger.error(`Export for thesis ${thesisData.title} to Oracle DB has failed`)
+        logger.error(err)
     }
 }
 
@@ -135,6 +137,7 @@ const updateGraderRow = async (trx, thesisRow, thesisData, mainGraderId) => {
     const graderRow = await trx('OHJAUS')
         .where('GRADUTUNNUS', thesisRow.TUNNUS)
         .andWhere('OHJAAJATUNNUS', mainGraderId)
+        .first()
 
     if (graderRow) {
         return graderRow

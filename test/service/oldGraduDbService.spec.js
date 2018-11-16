@@ -14,7 +14,7 @@ test.before(async () => {
 
 const thesisCount = () => oracleKnex('GRADU').count().first()
 
-test('Export thesis that has no information on old system', async (t) => {
+test.skip('Export thesis that has no information on old system', async (t) => {
     const thesisRowsBefore = await thesisCount()
 
     await OldGraduDbService.exportThesisToOldDb([2])

@@ -17,6 +17,6 @@ ldconfig || exit 1
 echo "Add LD_LIBRARY_PATH variable"
 export LD_LIBRARY_PATH=/opt/oracle:$LD_LIBRARY_PATH
 
-echo "Now starting Grappa fron"
+echo "Now starting Grappa"
 cd /usr/src/app || exit 1
 npm run start:prod || exit 1

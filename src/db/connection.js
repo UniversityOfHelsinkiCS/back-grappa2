@@ -36,6 +36,13 @@ module.exports.getOracleKnex = () => {
         return oracleKnex
     }
 
+    // Oracle connections are ignored for tests because
+    // tests related to oracle connections are marked to be skipped.
+    // Remove this block if you want to run tests for oracle export.
+    if (env === 'test') {
+        return knex
+    }
+
     oracleKnex = knexModule(oracleConfig)
     return oracleKnex
 }
