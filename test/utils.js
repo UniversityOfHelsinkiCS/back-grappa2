@@ -5,6 +5,53 @@ const errorHandler = require('../src/util/errorHandler')
 const express = require('express')
 const auth = require('../src/middleware/auth')
 
+export const TEST_THESIS_NAME = 'example_thesis.pdf'
+
+/* eslint-disable */
+export const generateTestEthesisMetadata = ()  => {
+    const currentYear = new Date().getFullYear()
+
+return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<mets ID="sort-mets_mets" OBJID="sword-mets" LABEL="DSpace SWORD Item" PROFILE="DSpace METS SIP Profile 1.0" xmlns="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
+  <metsHdr CREATEDATE="2007-09-01T00:00:00">
+    <agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
+      <name>Grappa 2.0</name>
+    </agent>
+  </metsHdr>
+  <dmdSec ID="sword-mets-dmd-1" GROUPID="sword-mets-dmd-1_group-1">
+    <mdWrap LABEL="Metadata" MDTYPE="OTHER" OTHERMDTYPE="dim" MIMETYPE="text/xml">
+      <xmlData xmlns:dim="http://www.dspace.org/xmlns/dspace/dim">
+        <dim:field mdschema="dc" element="title">the awesome thesis</dim:field>
+        <dim:field mdschema="dct" element="identifier" qualifier="urn">testUrn</dim:field>
+        <dim:field mdschema="dct" element="creator">awesome author</dim:field>
+        <dim:field mdschema="dct" element="issued">${currentYear}</dim:field>
+        <dim:field mdschema="dct" element="abstract" lang="en">english abstract</dim:field>
+        <dim:field mdschema="dct" element="abstract" lang="fi">finnish abstract</dim:field>
+        <dim:field mdschema="dct" element="subject">test subject</dim:field>
+        <dim:field mdschema="ethesis" element="language" lang="en">English</dim:field>
+        <dim:field mdschema="ethesis" element="thesistype" lang="en">master's thesis</dim:field>
+        <dim:field mdschema="ethesis" element="discipline" lang="en">discipline</dim:field>
+      </xmlData>
+    </mdWrap>
+  </dmdSec>
+  <fileSec>
+    <fileGrp ID="sword-mets-fgrp-1" USE="CONTENT">
+      <file GROUPID="sword-mets-fgid-0" ID="sword-mets-file-1" MIMETYPE="application/pdf">
+        <FLocat LOCTYPE="URL" xlink:href="${TEST_THESIS_NAME}"/>
+      </file>
+    </fileGrp>
+  </fileSec>
+  <structMap ID="sword-mets-struct-1" LABEL="structure" TYPE="LOGICAL">
+    <div ID="sword-mets-div-1" DMDID="sword-mets-dmd-1" TYPE="SWORD Object">
+      <div ID="sword-mets-div-2" TYPE="File">
+        <fptr FILEID="sword-mets-file-1"/>
+      </div>
+    </div>
+  </structMap>
+</mets>`
+}
+/* eslint-enable */
+
 export async function createPerson(email) {
     const person = {
         email,
