@@ -1,5 +1,6 @@
 const Promise = require('bluebird')
 
+const logger = require('../util/logger')
 const oracleKnex = require('../db/connection').getOracleKnex()
 const knex = require('../db/connection').getKnex()
 
@@ -74,7 +75,7 @@ const exportThesisData = async (thesisData) => {
 
         await trx.commit()
     } catch (err) {
-        console.log(err)
+        logger.error(`Export for thesis ${thesisData.title} to Oracle DB has failed`, { error: err })
     }
 }
 
