@@ -1,3 +1,5 @@
+const logger = require('../util/logger')
+
 const xml = require('xmlbuilder')
 const axios = require('axios')
 
@@ -6,8 +8,8 @@ const { URN_GENERATOR_ADDRESS } = require('../util/config')
 
 const CLIENT_NAME = 'Grappa 2.0'
 const THESIS_TYPE = 'master\'s thesis'
-const THESIS_DISCIPLINE = 'discipline'
 const DEFAULT_THESIS_LANG = 'English'
+const OLD_PROGRAM_NAME_PREFIX = 'Program'
 
 const metadataSchemaTypes = {
     DC: 'dc',
@@ -20,17 +22,25 @@ const metadataElementTypes = {
     IDENTIFIER: 'identifier',
     CREATOR: 'creator',
     ISSUED: 'issued',
-    ABSTRACT: 'abstract',
-    SUBJECT: 'subject',
     LANGUAGE: 'language',
     THESIS_TYPE: 'thesistype',
-    DISCIPLINE: 'discipline'
+    DISCIPLINE: 'discipline',
+    FACULTY: 'faculty',
+    DEGREE_PROGRAM: 'degreeprogram',
+    STUDY_FIELD: 'facultystudyline',
+    DEGREE_PROGRAM_TYPE: 'hasdegreeprograms'
+}
+
+const degreeProgramTypes = {
+    NEW: 'U',
+    OLD: 'V'
 }
 
 const metadataLangTypes = {
     FI: 'fi',
     EN: 'en',
-    SV: 'sv'
+    SV: 'sv',
+    UND: 'und'
 }
 
 const metadataQualifierTypes = {
@@ -46,6 +56,7 @@ const checkForUrnGeneratorErrors = (response) => {
             data,
             embeddedError: true
         }
+        logger.error(`Fetching urn from ${URN_GENERATOR_ADDRESS} failed: ${data}`)
         throw embededError
     }
 }
@@ -93,24 +104,30 @@ const generateMetadataXmlDataFields = (metadata) => {
     const currentYear = new Date().getFullYear()
     const thesisLang = metadata.thesisLang || DEFAULT_THESIS_LANG
 
+    const { title, author, URN, studyfield, programme } = metadata
+
+    const isOldDegreeProgram = programme.includes(OLD_PROGRAM_NAME_PREFIX)
+    const degreeProgramType = isOldDegreeProgram ? degreeProgramTypes.OLD : degreeProgramTypes.NEW
+
     return {
         '@xmlns:dim': 'http://www.dspace.org/xmlns/dspace/dim',
         'dim:field': [
-            getMetadataField(metadataSchemaTypes.DC, metadataElementTypes.TITLE, metadata.thesisTitle),
-            getDctMetadataField(metadataElementTypes.IDENTIFIER, metadata.URN, null, metadataQualifierTypes.URN),
-            getDctMetadataField(metadataElementTypes.CREATOR, metadata.author),
+            getMetadataField(metadataSchemaTypes.DC, metadataElementTypes.TITLE, title),
+            getDctMetadataField(metadataElementTypes.IDENTIFIER, URN, null, metadataQualifierTypes.URN),
+            getDctMetadataField(metadataElementTypes.CREATOR, author),
             getDctMetadataField(metadataElementTypes.ISSUED, currentYear),
-            getDctMetadataField(metadataElementTypes.ABSTRACT, metadata.abstract.en, metadataLangTypes.EN),
-            getDctMetadataField(metadataElementTypes.ABSTRACT, metadata.abstract.fi, metadataLangTypes.FI),
-            getDctMetadataField(metadataElementTypes.SUBJECT, metadata.thesisSubject),
             getEthesisMetadataField(metadataElementTypes.LANGUAGE, thesisLang, metadataLangTypes.EN),
             getEthesisMetadataField(metadataElementTypes.THESIS_TYPE, THESIS_TYPE, metadataLangTypes.EN),
-            getEthesisMetadataField(metadataElementTypes.DISCIPLINE, THESIS_DISCIPLINE, metadataLangTypes.EN)
+            getEthesisMetadataField(metadataElementTypes.DISCIPLINE, programme, metadataLangTypes.EN),
+            getEthesisMetadataField(metadataElementTypes.STUDY_FIELD, studyfield, metadataLangTypes.EN),
+            getEthesisMetadataField(metadataElementTypes.DEGREE_PROGRAM, programme, metadataLangTypes.EN),
+            getEthesisMetadataField(metadataElementTypes.DEGREE_PROGRAM_TYPE, degreeProgramType, metadataLangTypes.UND)
         ]
     }
 }
 
-const generateMetadataXml = async (metadata, thesisFileName) => {
+const generateMetadataXml = async (metadata) => {
+    const { filename } = metadata
     let URN
     try {
         URN = await getMetadataUrn()
@@ -118,7 +135,7 @@ const generateMetadataXml = async (metadata, thesisFileName) => {
         throw err
     }
 
-    const meta = Object.assign({}, metadata, { URN })
+    const metaDataWithUrn = Object.assign({}, metadata, { URN })
 
     const mets = {
         '@ID': 'sort-mets_mets',
@@ -147,7 +164,7 @@ const generateMetadataXml = async (metadata, thesisFileName) => {
                 '@MDTYPE': 'OTHER',
                 '@OTHERMDTYPE': 'dim',
                 '@MIMETYPE': 'text/xml',
-                xmlData: generateMetadataXmlDataFields(meta)
+                xmlData: generateMetadataXmlDataFields(metaDataWithUrn)
             }
         },
         fileSec: {
@@ -160,7 +177,7 @@ const generateMetadataXml = async (metadata, thesisFileName) => {
                     '@MIMETYPE': 'application/pdf',
                     FLocat: {
                         '@LOCTYPE': 'URL',
-                        '@xlink:href': thesisFileName
+                        '@xlink:href': filename
                     }
                 }
             }

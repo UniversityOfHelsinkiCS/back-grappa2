@@ -16,6 +16,8 @@ const thesisSchema = [
     'printDone'
 ]
 
+const THESIS_TABLE = 'thesis'
+
 // Fetch all theses
 // Include in a thesis the graders, authors and primary supervisor
 export const getAllTheses = async () => {
@@ -37,7 +39,7 @@ export const getThesesByPersonId = async (personId) => {
 
 // In cases we need theses for a programme (resp_prof)
 export const getThesesInProgramme = async (programmeId) => {
-    const studyfields = await studyfieldService.getPrgorammeStudyfields(programmeId).then(res => res.serialize())
+    const studyfields = await studyfieldService.getProgrammeStudyfields(programmeId).then(res => res.serialize())
     const theses = await getThesesForFiltering()
     const programmeTheses = theses.filter(thesis => thesis.agreements
         .find(agreement => studyfields.find(studyfield => agreement.studyfieldId === studyfield.studyfieldId)))
@@ -64,12 +66,10 @@ export const getThesesByAgreementPerson = async (personId) => {
     return getAuthorsSupervisorsGraders(agreementPersonsTheses)
 }
 
-export const getThesisById = async (thesisId) => {
-    return getThesisWithRelated(thesisId)
-}
+export const getThesisById = async thesisId => getThesisWithRelated(thesisId)
 
 export const saveThesis = async (thesis, trx) => {
-    const thesisIds = await knex('thesis')
+    const thesisIds = await knex(THESIS_TABLE)
         .returning('thesisId')
         .insert(thesis)
         .transacting(trx)
@@ -77,19 +77,19 @@ export const saveThesis = async (thesis, trx) => {
     const thesisId = thesisIds[0]
     return knex
         .select(thesisSchema)
-        .from('thesis')
+        .from(THESIS_TABLE)
         .where('thesisId', thesisId)
         .first()
         .transacting(trx)
 }
 
-export const updateThesis = async (thesisData, trx) => knex('thesis')
+export const updateThesis = async (thesisData, trx) => knex(THESIS_TABLE)
     .where('thesisId', thesisData.thesisId)
     .update(thesisData)
     .transacting(trx)
     .then(() => getThesisById(thesisData.thesisId))
 
-export const markPrinted = thesisIds => knex('thesis')
+export const markPrinted = thesisIds => knex(THESIS_TABLE)
     .update({ printDone: true })
     .whereIn('thesisId', thesisIds)
 
@@ -104,6 +104,17 @@ export const getPersonRoleForThesis = async (thesis, agreements, role) => {
     }
     ))
     return persons
+}
+
+export const getPendingEthesisUploads = async () => knex(THESIS_TABLE)
+    .where('printDone', true)
+    .andWhere('sentToEthesis', false)
+    .select('thesisId', 'title')
+
+export const setSentToEthesis = async (thesisId) => {
+    await knex(THESIS_TABLE)
+        .update({ sentToEthesis: true })
+        .where('thesisId', thesisId)
 }
 
 /**
