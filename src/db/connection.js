@@ -36,6 +36,6 @@ module.exports.getOracleKnex = () => {
         return oracleKnex
     }
 
-    oracleKnex = knexModule(oracleConfig.development)
+    oracleKnex = knexModule(oracleConfig)
     return oracleKnex
 }
