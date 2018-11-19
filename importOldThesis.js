@@ -41,7 +41,7 @@ async function run() {
 }
 
 async function saveThesis(thesisRow, studyfields) {
-    const data = thesisRow.split('')
+    const data = thesisRow.split(';')
     const [, title, , , , , , , studyfield, , , , , , , , , status, date, , , , , grade] = data
 
     if (!studyfield) {
