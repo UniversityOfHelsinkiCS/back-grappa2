@@ -80,3 +80,7 @@ back-grappa2.iml
 
 import/
 apidoc/
+
+*.zip
+/docker-compose.yml
+local-dev/grappa_db/grappa_pgdata

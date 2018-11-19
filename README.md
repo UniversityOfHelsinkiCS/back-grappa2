@@ -17,6 +17,20 @@ Dependencies: [![Known Vulnerabilities](https://snyk.io/test/github/UniversityOf
 
 # Installation
 
+## Oracle
+CS theses info is also stored to old Oracle database. Because enterpri$e, you just cant npm install
+oracle driver. You must download and install some files manually: [instructions](hhttps://oracle.github.io/node-oracledb/INSTALL.html#-2-quick-start-node-oracledb-installation)
+
+TL;DR; Download oracle libs to `~/lib`
+
+Make sure that your `hostname` is set to `/etc/hosts`. Otherwise you will get `ORA-24454` error.
+
+You can set up local test Oracle database:
+```
+cd local-dev/oracle
+docker-compose up
+```
+
 ## Database
 Install docker & docker-compose:
 
@@ -24,24 +38,10 @@ Install docker CE: https://docs.docker.com/engine/installation/
 
 Install docker-compose: https://docs.docker.com/compose/install/
 
-Create docker-compose.yml file containing following:
 ```
-version: '3'
-
-services:
-  grappa_db:
-    image: postgres:9.6.3
-    ports:
-      - "5321:5432"
-    volumes:
-      - ./grappa_pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: grappadata
-    container_name: grappa_db
+cd local-dev/grappa_db
+docker-compose up -d
 ```
-
-To start the database run:
-`docker-compose up -d`
 
 ## Set up project
 
