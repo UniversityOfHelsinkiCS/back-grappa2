@@ -6,26 +6,13 @@ const { generateMetadataXml } = require('../../src/services/EthesisMetadataServi
 
 const mock = new MockAdapter(axios)
 const {
-    generateTestEthesisMetadata,
-    TEST_THESIS_FILE_NAME,
-    TEST_THESIS_STUDYFIELD,
-    TEST_THESIS_AUTHOR,
-    TEST_THESIS_TITLE,
-    OLD_DEGREE_PROGRAM,
-    NEW_DEGREE_PROGRAM
+    generateTestEthesisMetadataXml,
+    getTestMetadata,
+    TEST_THESIS_FILE_NAME
 } = require('../utils')
 
 // title, author, URN, studyfield, programme
 const TEST_URN = 'testUrn'
-
-const getTestMetadata = (isOldDegreeProgram = false) => ({
-    title: TEST_THESIS_TITLE,
-    author: TEST_THESIS_AUTHOR,
-    filename: TEST_THESIS_FILE_NAME,
-    studyfield: TEST_THESIS_STUDYFIELD,
-    programme: isOldDegreeProgram ? OLD_DEGREE_PROGRAM : NEW_DEGREE_PROGRAM
-})
-
 
 const mockGetMetadataUrn = (response, status = 200) => {
     mock.onGet(URN_GENERATOR_ADDRESS, {
@@ -45,7 +32,7 @@ test.serial('returns properly formatted metadata xml with new degree program', a
 
     const metadata = getTestMetadata()
     const generatedMetadata = await generateMetadataXml(metadata, TEST_THESIS_FILE_NAME)
-    const expectedXml = generateTestEthesisMetadata()
+    const expectedXml = generateTestEthesisMetadataXml()
 
     t.is(generatedMetadata, expectedXml)
 })
@@ -56,7 +43,7 @@ test.serial('returns properly formatted metadata xml with old degree program', a
     const isOldDegreeProgram = true
     const metadata = getTestMetadata(isOldDegreeProgram)
     const generatedMetadata = await generateMetadataXml(metadata, TEST_THESIS_FILE_NAME)
-    const expectedXml = generateTestEthesisMetadata(isOldDegreeProgram)
+    const expectedXml = generateTestEthesisMetadataXml(isOldDegreeProgram)
 
     t.is(generatedMetadata, expectedXml)
 })

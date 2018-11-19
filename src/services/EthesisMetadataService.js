@@ -104,7 +104,7 @@ const generateMetadataXmlDataFields = (metadata) => {
     const currentYear = new Date().getFullYear()
     const thesisLang = metadata.thesisLang || DEFAULT_THESIS_LANG
 
-    const { title, author, URN, studyfield, programme } = metadata
+    const { title, author, URN, studyfield, programme, faculty } = metadata
 
     const isOldDegreeProgram = programme.includes(OLD_PROGRAM_NAME_PREFIX)
     const degreeProgramType = isOldDegreeProgram ? degreeProgramTypes.OLD : degreeProgramTypes.NEW
@@ -121,7 +121,8 @@ const generateMetadataXmlDataFields = (metadata) => {
             getEthesisMetadataField(metadataElementTypes.DISCIPLINE, programme, metadataLangTypes.EN),
             getEthesisMetadataField(metadataElementTypes.STUDY_FIELD, studyfield, metadataLangTypes.EN),
             getEthesisMetadataField(metadataElementTypes.DEGREE_PROGRAM, programme, metadataLangTypes.EN),
-            getEthesisMetadataField(metadataElementTypes.DEGREE_PROGRAM_TYPE, degreeProgramType, metadataLangTypes.UND)
+            getEthesisMetadataField(metadataElementTypes.DEGREE_PROGRAM_TYPE, degreeProgramType, metadataLangTypes.UND),
+            getEthesisMetadataField(metadataElementTypes.FACULTY, faculty, metadataLangTypes.FI)
         ]
     }
 }

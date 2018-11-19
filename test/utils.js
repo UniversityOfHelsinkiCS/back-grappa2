@@ -5,22 +5,34 @@ const errorHandler = require('../src/util/errorHandler')
 const express = require('express')
 const auth = require('../src/middleware/auth')
 
+export const TEST_THESIS_ID = 1
 export const TEST_THESIS_TITLE = 'example thesis'
 export const TEST_THESIS_FILE_NAME = 'example_thesis.pdf'
 export const TEST_THESIS_AUTHOR = 'test author'
-export const TEST_THESIS_STUDYFIELD = 'Software Systems'
-export const OLD_DEGREE_PROGRAM = 'Department of Computer Science'
-export const NEW_DEGREE_PROGRAM = 'Master\'s Programme in Computer Science'
+export const TEST_STUDYFIELD = 'Software Systems'
+export const TEST_FACULTY = 'Matemaattis-luonnontieteellinen tiedekunta'
+export const TEST_OLD_DEGREE_PROGRAM = 'Department of Computer Science'
+export const TEST_NEW_DEGREE_PROGRAM = 'Master\'s Programme in Computer Science'
+
 export const degreeProgramTypes = {
     OLD: 'V',
     NEW: 'U'
 }
 
+export const getTestMetadata = (isOldDegreeProgram = false) => ({
+    title: TEST_THESIS_TITLE,
+    author: TEST_THESIS_AUTHOR,
+    filename: TEST_THESIS_FILE_NAME,
+    studyfield: TEST_STUDYFIELD,
+    faculty: TEST_FACULTY,
+    programme: isOldDegreeProgram ? TEST_OLD_DEGREE_PROGRAM : TEST_NEW_DEGREE_PROGRAM
+})
+
 /* eslint-disable */
-export const generateTestEthesisMetadata = (isOldDegreeProgram = false)  => {
+export const generateTestEthesisMetadataXml = (isOldDegreeProgram = false)  => {
     const currentYear = new Date().getFullYear()
     const degreeProgramType = isOldDegreeProgram ? degreeProgramTypes.OLD : degreeProgramTypes.NEW
-    const programme = isOldDegreeProgram ? OLD_DEGREE_PROGRAM : NEW_DEGREE_PROGRAM
+    const programme = isOldDegreeProgram ? TEST_OLD_DEGREE_PROGRAM : TEST_NEW_DEGREE_PROGRAM
 
     return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <mets ID="sort-mets_mets" OBJID="sword-mets" LABEL="DSpace SWORD Item" PROFILE="DSpace METS SIP Profile 1.0" xmlns="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
@@ -39,9 +51,10 @@ export const generateTestEthesisMetadata = (isOldDegreeProgram = false)  => {
         <dim:field mdschema="ethesis" element="language" lang="en">English</dim:field>
         <dim:field mdschema="ethesis" element="thesistype" lang="en">master's thesis</dim:field>
         <dim:field mdschema="ethesis" element="discipline" lang="en">${programme}</dim:field>
-        <dim:field mdschema="ethesis" element="facultystudyline" lang="en">${TEST_THESIS_STUDYFIELD}</dim:field>
+        <dim:field mdschema="ethesis" element="facultystudyline" lang="en">${TEST_STUDYFIELD}</dim:field>
         <dim:field mdschema="ethesis" element="degreeprogram" lang="en">${programme}</dim:field>
         <dim:field mdschema="ethesis" element="hasdegreeprograms" lang="und">${degreeProgramType}</dim:field>
+        <dim:field mdschema="ethesis" element="faculty" lang="fi">${TEST_FACULTY}</dim:field>
       </xmlData>
     </mdWrap>
   </dmdSec>
