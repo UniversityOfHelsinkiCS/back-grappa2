@@ -5,13 +5,24 @@ const errorHandler = require('../src/util/errorHandler')
 const express = require('express')
 const auth = require('../src/middleware/auth')
 
-export const TEST_THESIS_NAME = 'example_thesis.pdf'
+export const TEST_THESIS_TITLE = 'example thesis'
+export const TEST_THESIS_FILE_NAME = 'example_thesis.pdf'
+export const TEST_THESIS_AUTHOR = 'test author'
+export const TEST_THESIS_STUDYFIELD = 'Software Systems'
+export const OLD_DEGREE_PROGRAM = 'Department of Computer Science'
+export const NEW_DEGREE_PROGRAM = 'Master\'s Programme in Computer Science'
+export const degreeProgramTypes = {
+    OLD: 'V',
+    NEW: 'U'
+}
 
 /* eslint-disable */
-export const generateTestEthesisMetadata = ()  => {
+export const generateTestEthesisMetadata = (isOldDegreeProgram = false)  => {
     const currentYear = new Date().getFullYear()
+    const degreeProgramType = isOldDegreeProgram ? degreeProgramTypes.OLD : degreeProgramTypes.NEW
+    const programme = isOldDegreeProgram ? OLD_DEGREE_PROGRAM : NEW_DEGREE_PROGRAM
 
-return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <mets ID="sort-mets_mets" OBJID="sword-mets" LABEL="DSpace SWORD Item" PROFILE="DSpace METS SIP Profile 1.0" xmlns="http://www.loc.gov/METS/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
   <metsHdr CREATEDATE="2007-09-01T00:00:00">
     <agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
@@ -21,23 +32,23 @@ return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   <dmdSec ID="sword-mets-dmd-1" GROUPID="sword-mets-dmd-1_group-1">
     <mdWrap LABEL="Metadata" MDTYPE="OTHER" OTHERMDTYPE="dim" MIMETYPE="text/xml">
       <xmlData xmlns:dim="http://www.dspace.org/xmlns/dspace/dim">
-        <dim:field mdschema="dc" element="title">the awesome thesis</dim:field>
+        <dim:field mdschema="dc" element="title">${TEST_THESIS_TITLE}</dim:field>
         <dim:field mdschema="dct" element="identifier" qualifier="urn">testUrn</dim:field>
-        <dim:field mdschema="dct" element="creator">awesome author</dim:field>
+        <dim:field mdschema="dct" element="creator">${TEST_THESIS_AUTHOR}</dim:field>
         <dim:field mdschema="dct" element="issued">${currentYear}</dim:field>
-        <dim:field mdschema="dct" element="abstract" lang="en">english abstract</dim:field>
-        <dim:field mdschema="dct" element="abstract" lang="fi">finnish abstract</dim:field>
-        <dim:field mdschema="dct" element="subject">test subject</dim:field>
         <dim:field mdschema="ethesis" element="language" lang="en">English</dim:field>
         <dim:field mdschema="ethesis" element="thesistype" lang="en">master's thesis</dim:field>
-        <dim:field mdschema="ethesis" element="discipline" lang="en">discipline</dim:field>
+        <dim:field mdschema="ethesis" element="discipline" lang="en">${programme}</dim:field>
+        <dim:field mdschema="ethesis" element="facultystudyline" lang="en">${TEST_THESIS_STUDYFIELD}</dim:field>
+        <dim:field mdschema="ethesis" element="degreeprogram" lang="en">${programme}</dim:field>
+        <dim:field mdschema="ethesis" element="hasdegreeprograms" lang="und">${degreeProgramType}</dim:field>
       </xmlData>
     </mdWrap>
   </dmdSec>
   <fileSec>
     <fileGrp ID="sword-mets-fgrp-1" USE="CONTENT">
       <file GROUPID="sword-mets-fgid-0" ID="sword-mets-file-1" MIMETYPE="application/pdf">
-        <FLocat LOCTYPE="URL" xlink:href="${TEST_THESIS_NAME}"/>
+        <FLocat LOCTYPE="URL" xlink:href="${TEST_THESIS_FILE_NAME}"/>
       </file>
     </fileGrp>
   </fileSec>

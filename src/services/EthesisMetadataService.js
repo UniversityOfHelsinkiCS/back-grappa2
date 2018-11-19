@@ -9,7 +9,7 @@ const { URN_GENERATOR_ADDRESS } = require('../util/config')
 const CLIENT_NAME = 'Grappa 2.0'
 const THESIS_TYPE = 'master\'s thesis'
 const DEFAULT_THESIS_LANG = 'English'
-const OLD_PROGRAM_NAME_PREFIX = 'Program'
+const OLD_PROGRAM_NAME_PREFIX = 'Department'
 
 const metadataSchemaTypes = {
     DC: 'dc',

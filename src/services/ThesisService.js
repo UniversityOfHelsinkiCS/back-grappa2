@@ -136,7 +136,9 @@ const getThesesForFiltering = () => (
 const getThesisWithRelated = async (thesisId) => {
     const thesis = await Thesis.where('thesisId', thesisId).fetch({ withRelated: [
         { authors: (qb) => { qb.columns('person.personId', 'email', 'firstname', 'lastname', 'isRetired') } },
-        { agreements: (qb) => { qb.columns('agreementId', 'thesisId', 'studyfieldId', 'authorId', 'responsibleSupervisorId') } },
+        { agreements: (qb) => {
+            qb.columns('agreementId', 'thesisId', 'studyfieldId', 'authorId', 'responsibleSupervisorId')
+        } },
         'supervisors'
     ] }).then(res => res.serialize())
     const { agreements } = thesis
