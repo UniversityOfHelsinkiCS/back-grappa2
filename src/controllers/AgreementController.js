@@ -68,3 +68,20 @@ export async function getAllAgreements(req, res) {
 export async function saveAgreementForm(req, res) {
     res.status(501).end()
 }
+
+// Only updating studies completed field for own agreement is possible
+export async function updateAgreement(req, res) {
+    try {
+        const user = await personService.getLoggedPerson(req)
+        const { personId } = user
+        const agreementId = req.params.id
+        const { studiesComplete } = req.body
+
+        await agreementService.updateStudiesComplete(agreementId, personId, studiesComplete)
+
+        res.status(204).end()
+    } catch (err) {
+        logger.error(err)
+        res.status(500).end()
+    }
+}

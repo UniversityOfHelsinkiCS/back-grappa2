@@ -244,3 +244,10 @@ export const getThesisMetadataByIds = async (thesisIds) => {
         .innerJoin('attachment', 'agreement.agreementId', '=', 'attachment.agreementId')
         .select(informationSchema)
 }
+
+export const updateStudiesComplete = (agreementId, personId, studiesComplete) => knex('agreement')
+    .update({ studiesComplete })
+    .where({
+        agreementId,
+        authorId: personId
+    })

@@ -26,4 +26,7 @@ router.get('/', (req, res, next) => agreementController.getAllAgreements(req, re
 router.post('/', jsonParser, auth.checkStaff, (req, res, next) =>
     agreementController.saveAgreementForm(req, res).catch(next))
 
+router.put('/:id', jsonParser, (req, res, next) =>
+    agreementController.updateAgreement(req, res).catch(next))
+
 module.exports = router
