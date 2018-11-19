@@ -5,4 +5,4 @@ services:
     ports:
       - 127.0.0.1:1521:1521
     volumes:
-      - ./oracle/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
