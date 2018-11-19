@@ -4,9 +4,9 @@ const JSZip = require('jszip')
 const axios = require('axios')
 
 const { axiosErrorHandler } = require('../util/axiosErrorHandler')
-const { getPendingEthesisUploads, setSentToEthesis } = require('../services/ThesisService')
-const { getThesisMetadataByIds } = require('../services/AgreementService')
-const { generateMetadataXml } = require('../../src/services/EthesisMetadataService')
+const thesisService = require('../services/ThesisService')
+const agreementService = require('../services/AgreementService')
+const ethesisMetadataService = require('../services/EthesisMetadataService')
 const {
     ETHESIS_USERNAME,
     ETHESIS_PASSWORD,
@@ -30,9 +30,9 @@ const flattenThesesMetadata = metadata => metadata.reduce((acc, cur) => {
 }, {})
 
 const checkAndUploadPendingTheses = async () => {
-    const theses = await getPendingEthesisUploads()
+    const theses = await thesisService.getPendingEthesisUploads()
     const thesesIds = theses.map(t => t.thesisId)
-    const thesesMetadata = await getThesisMetadataByIds(thesesIds)
+    const thesesMetadata = await agreementService.getThesisMetadataByIds(thesesIds)
     const flattenedMetadata = flattenThesesMetadata(thesesMetadata)
     const thesesWithMetadata = theses.reduce((acc, cur) => {
         if (acc[cur.thesisId] && acc[cur.thesisId].filename) {
@@ -41,11 +41,11 @@ const checkAndUploadPendingTheses = async () => {
         return acc
     }, flattenedMetadata)
 
-    Promise.all(Object.values(thesesWithMetadata).map(async (metadata) => {
+    await Promise.all(Object.values(thesesWithMetadata).map(async (metadata) => {
         const { thesisId, filename } = metadata
         try {
             await sendThesisToEthesis(metadata)
-            await setSentToEthesis(thesisId)
+            await thesisService.setSentToEthesis(thesisId)
         } catch (err) {
             logger.error(`Sending thesis with filename ${filename} to ethesis failed.`)
         }
@@ -55,7 +55,7 @@ const checkAndUploadPendingTheses = async () => {
 const sendThesisToEthesis = async (metadata) => {
     const { filename } = metadata
     const thesisPdf = await fs.readFileSync(`${FILE_UPLOAD_PATH}${filename}`)
-    const metadataXml = await generateMetadataXml(metadata)
+    const metadataXml = await ethesisMetadataService.generateMetadataXml(metadata)
     const metadataFilename = 'mets.xml'
 
     const zip = new JSZip()
@@ -95,6 +95,5 @@ const sendThesisToEthesis = async (metadata) => {
 }
 
 module.exports = {
-    sendThesisToEthesis,
     checkAndUploadPendingTheses
 }

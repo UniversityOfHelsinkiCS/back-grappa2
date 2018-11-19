@@ -106,16 +106,15 @@ export const getPersonRoleForThesis = async (thesis, agreements, role) => {
     return persons
 }
 
-export const getPendingEthesisUploads = async () => knex(THESIS_TABLE)
+export const getPendingEthesisUploads = () => knex(THESIS_TABLE)
     .where('printDone', true)
     .andWhere('sentToEthesis', false)
     .select('thesisId', 'title')
 
-export const setSentToEthesis = async (thesisId) => {
-    await knex(THESIS_TABLE)
-        .update({ sentToEthesis: true })
-        .where('thesisId', thesisId)
-}
+export const setSentToEthesis = thesisId => knex(THESIS_TABLE)
+    .update({ sentToEthesis: true })
+    .where('thesisId', thesisId)
+
 
 /**
  * Fetches all theses from database, with associated authors, supervisors and agreements.
