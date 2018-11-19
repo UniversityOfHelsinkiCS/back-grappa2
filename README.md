@@ -19,7 +19,7 @@ Dependencies: [![Known Vulnerabilities](https://snyk.io/test/github/UniversityOf
 
 ## Oracle
 CS theses info is also stored to old Oracle database. Because enterpri$e, you just cant npm install
-oracle driver. You must download and install some files manually: [instructions](hhttps://oracle.github.io/node-oracledb/INSTALL.html#-2-quick-start-node-oracledb-installation)
+oracle driver. You must download and install some files manually: [instructions](https://oracle.github.io/node-oracledb/INSTALL.html#-2-quick-start-node-oracledb-installation)
 
 TL;DR; Download oracle libs to `~/lib`
 
@@ -56,6 +56,15 @@ Create .env file to project root, fill the following:
 ```
 DATABASE_URL=postgres://postgres@localhost:5321/grappadata
 TOKEN_SECRET=LikeNoOneEverWas
+ORACLE_DATABASE_URL=localhost
+ORACLE_DATABASE_USER=gradu-user
+ORACLE_DATABASE_PASSWORD=gradu-password
+ORACLE_DATABASE_SERVICE=gradu-service
+ETHESIS_USERNAME=username
+ETHESIS_PASSWORD=password
+ETHESIS_BASE_URL=http://ethesis.base.url
+URN_GENERATOR_ADDRESS=http://urn.generator.address
+ETHESIS_UPLOAD_CRON="0 23 * * *"
 ```
 
 Run:
