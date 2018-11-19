@@ -83,3 +83,4 @@ apidoc/
 
 *.zip
 /docker-compose.yml
+local-dev/grappa_db/grappa_pgdata
