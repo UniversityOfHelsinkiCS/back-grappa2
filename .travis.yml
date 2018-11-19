@@ -13,13 +13,14 @@ before_script:
   - psql -c 'create schema grappa_test;' -U postgres grappa
 
 env:
-  - DATABASE_URL=postgres://postgres@localhost/grappa
-  - CONSOLE_OUTPUT=true
-  - TOKEN_SECRET=salainen_token
-  - ORACLE_DATABASE_URL=localhost
-  - ORACLE_DATABASE_USER=gradu-user
-  - ORACLE_DATABASE_PASSWORD=gradu-password
-  - ORACLE_DATABASE_SERVICE=gradu-service
+  global:
+    - DATABASE_URL=postgres://postgres@localhost/grappa
+    - CONSOLE_OUTPUT=true
+    - TOKEN_SECRET=salainen_token
+    - ORACLE_DATABASE_URL=localhost
+    - ORACLE_DATABASE_USER=gradu-user
+    - ORACLE_DATABASE_PASSWORD=gradu-password
+    - ORACLE_DATABASE_SERVICE=gradu-service
 
 script: npm run test-tap
 
