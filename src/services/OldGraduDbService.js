@@ -72,6 +72,7 @@ const exportThesisData = async (thesisData) => {
         await updateIfMissing(trx, 'VALMISTELIJA', thesisRow, mainGraderId)
         await updateIfMissing(trx, 'VAHVISTAJA', thesisRow, mainGraderId)
         await updateGraderRow(trx, thesisRow, thesisData, mainGraderId)
+        await updateGradingRow(trx, thesisRow, mainGraderId)
 
         await trx.commit()
         logger.info(`Exported thesis ${thesisData.title} to Oracle DB`)
@@ -153,6 +154,27 @@ const updateGraderRow = async (trx, thesisRow, thesisData, mainGraderId) => {
             ROOLI: 'pääohjaaja',
             PAATTYMISAIKA: thesisData.councilMeeting
         })
+}
+
+const updateGradingRow = async (trx, thesisRow, mainGraderId) => {
+    const gradingRow = await trx('TARKASTUS')
+        .where('GRADUTUNNUS', thesisRow.TUNNUS)
+        .andWhere('VAIHE', 'gradu')
+
+    if (!gradingRow) {
+        const gradingId = await getIdFromSequence(trx, 'OTUNNUS')
+
+        await trx('TARKASTUS')
+            .insert({
+                TTUNNUS: gradingId[0].NEXTVAL,
+                GRADUTUNNUS: thesisRow.GRADUTUNNUS,
+                KIRJAAJA: mainGraderId,
+                VAIHE: 'gradu',
+                JATETTY_PVM: new Date(),
+                TARKASTETTU_PVM: new Date(),
+                TULOS: thesisRow.ARVOSANA
+            })
+    }
 }
 
 const getThesisRow = async (trx, thesisData) => {
