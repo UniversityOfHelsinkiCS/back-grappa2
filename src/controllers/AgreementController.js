@@ -78,11 +78,7 @@ const hasRightsToEditAgreement = async (agreementId, user) => {
     const agreementStudyfield = await studyfieldService.getStudyfield(agreement.studyfieldId)
     const agreementProgramme = agreementStudyfield.programmeId
 
-    if (agreement.authorId === user.personId) {
-        return true
-    }
-
-    if (rolesInProgrammes.find(item => item.role.name === 'admin')) {
+    if (agreement.authorId === user.personId || rolesInProgrammes.find(item => item.role.name === 'admin')) {
         return true
     }
 
@@ -94,12 +90,11 @@ const hasRightsToEditAgreement = async (agreementId, user) => {
 export async function updateAgreement(req, res) {
     try {
         const user = await personService.getLoggedPerson(req)
-        const { personId } = user
         const agreementId = req.params.id
         const { requestStudyModuleRegistration } = req.body
 
         if (await hasRightsToEditAgreement(agreementId, user)) {
-            await agreementService.updateStudyModuleRegistration(agreementId, personId, requestStudyModuleRegistration)
+            await agreementService.updateStudyModuleRegistration(agreementId, requestStudyModuleRegistration)
             res.status(204).end()
         } else {
             res.status(401).end()
