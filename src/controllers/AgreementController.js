@@ -9,7 +9,7 @@ const studyfieldService = require('../services/StudyfieldService')
 const PROGRAMME_ROLES = ['resp_professor', 'print_person', 'manager']
 
 // TODO: refactor
-export async function getAllAgreements(req, res) {
+export const getAllAgreements = async (req, res) => {
     // All = return agreements that a user might be interested in.
     try {
         const user = await personService.getLoggedPerson(req)
@@ -87,7 +87,7 @@ const hasRightsToEditAgreement = async (agreementId, user) => {
 }
 
 // Only updating studies completed field for own agreement is possible
-export async function updateAgreement(req, res) {
+export const updateAgreement = async (req, res) => {
     try {
         const user = await personService.getLoggedPerson(req)
         const agreementId = req.params.id
