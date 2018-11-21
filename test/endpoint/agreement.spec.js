@@ -28,7 +28,7 @@ const assertStudiesComplete = async (t, app, expected) => {
     const { agreements } = res.body
     const testAgreement = agreements[0]
 
-    t.is(testAgreement.studiesComplete, expected)
+    t.is(testAgreement.requestStudyModuleRegistration, expected)
 
     return testAgreement
 }
@@ -38,11 +38,11 @@ test('student can mark studies as completed', async (t) => {
     const app = await makeApp(10)
     const testAgreement = await assertStudiesComplete(t, app, false)
 
-    testAgreement.studiesComplete = true
+    testAgreement.requestStudyModuleRegistration = true
 
     const updateResponse = await request(app)
         .put(`/agreements/${testAgreement.agreementId}`)
-        .send({ studiesComplete: true })
+        .send({ requestStudyModuleRegistration: true })
 
     t.is(updateResponse.status, 204)
 

@@ -245,9 +245,6 @@ export const getThesisMetadataByIds = async (thesisIds) => {
         .select(informationSchema)
 }
 
-export const updateStudiesComplete = (agreementId, personId, studiesComplete) => knex('agreement')
-    .update({ studiesComplete })
-    .where({
-        agreementId,
-        authorId: personId
-    })
+export const updateStudyModuleRegistration = (agreementId, requestStudyModuleRegistration) => knex('agreement')
+    .update({ requestStudyModuleRegistration })
+    .where({ agreementId })

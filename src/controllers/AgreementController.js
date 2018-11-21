@@ -4,6 +4,9 @@ const agreementService = require('../services/AgreementService')
 const attachmentService = require('../services/AttachmentService')
 const personService = require('../services/PersonService')
 const roleService = require('../services/RoleService')
+const studyfieldService = require('../services/StudyfieldService')
+
+const PROGRAMME_ROLES = ['resp_professor', 'print_person', 'manager']
 
 // TODO: refactor
 export async function getAllAgreements(req, res) {
@@ -28,10 +31,9 @@ export async function getAllAgreements(req, res) {
             return
         }
 
-        const programmeRoles = ['resp_professor', 'print_person', 'manager']
         rolesInProgrammes.forEach(async (item) => {
             // As resp_prof, print-person and manager persons who are writing theses in programme
-            if (programmeRoles.includes(item.role.name)) {
+            if (PROGRAMME_ROLES.includes(item.role.name)) {
                 newAgreements = await agreementService.getAgreementsInProgramme(item.programme.programmeId)
                 agreements = [...new Set([...agreements, ...newAgreements])]
             }
@@ -69,17 +71,39 @@ export async function saveAgreementForm(req, res) {
     res.status(501).end()
 }
 
+
+const hasRightsToEditAgreement = async (agreementId, user) => {
+    const rolesInProgrammes = await roleService.getUsersRoles(user)
+    const agreement = await agreementService.getAgreementById(agreementId)
+    const agreementStudyfield = await studyfieldService.getStudyfield(agreement.studyfieldId)
+    const agreementProgramme = agreementStudyfield.programmeId
+
+    if (agreement.authorId === user.personId) {
+        return true
+    }
+
+    if (rolesInProgrammes.find(item => item.role.name === 'admin')) {
+        return true
+    }
+
+    return rolesInProgrammes.find(item =>
+        PROGRAMME_ROLES.includes(item.role.name) && item.programme.programmeId === agreementProgramme)
+}
+
 // Only updating studies completed field for own agreement is possible
 export async function updateAgreement(req, res) {
     try {
         const user = await personService.getLoggedPerson(req)
         const { personId } = user
         const agreementId = req.params.id
-        const { studiesComplete } = req.body
+        const { requestStudyModuleRegistration } = req.body
 
-        await agreementService.updateStudiesComplete(agreementId, personId, studiesComplete)
-
-        res.status(204).end()
+        if (await hasRightsToEditAgreement(agreementId, user)) {
+            await agreementService.updateStudyModuleRegistration(agreementId, personId, requestStudyModuleRegistration)
+            res.status(204).end()
+        } else {
+            res.status(401).end()
+        }
     } catch (err) {
         logger.error(err)
         res.status(500).end()
