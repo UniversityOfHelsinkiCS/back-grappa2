@@ -18,8 +18,33 @@ test('agreements get should also return attachments', async (t) => {
     const res = await request(await makeApp(10))
         .get('/agreements')
     t.is(res.status, 200)
-    const { agreements } = res.body
-    const { attachments } = res.body
+    const { agreements, attachments } = res.body
     t.is(agreements.length, 1)
     t.is(attachments.length, 1)
+})
+
+const assertStudiesComplete = async (t, app, expected) => {
+    const res = await request(app).get('/agreements')
+    const { agreements } = res.body
+    const testAgreement = agreements[0]
+
+    t.is(testAgreement.requestStudyModuleRegistration, expected)
+
+    return testAgreement
+}
+
+test('student can mark studies as completed', async (t) => {
+    t.plan(3)
+    const app = await makeApp(10)
+    const testAgreement = await assertStudiesComplete(t, app, false)
+
+    testAgreement.requestStudyModuleRegistration = true
+
+    const updateResponse = await request(app)
+        .put(`/agreements/${testAgreement.agreementId}`)
+        .send({ requestStudyModuleRegistration: true })
+
+    t.is(updateResponse.status, 204)
+
+    await assertStudiesComplete(t, app, true)
 })

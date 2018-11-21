@@ -63,7 +63,7 @@ export const sendAddedToGrappa = async (programmes, role, email, firstname, last
 
 export const sendRoleRequestNotification = async (address, roleName, granted, granterName, programmeName) => {
     const title = 'Notification from Grappa'
-    const body = `You have ${granted ? '' : 'NOT'} been granted the following role to Grappa:\n 
+    const body = `You have ${granted ? '' : 'NOT'} been granted the following role to Grappa:\n
     ${roleName} in ${programmeName}\n
     The request was handled by ${granterName}. Please contact them for any further information.`
     try {
@@ -77,7 +77,8 @@ export const notifyManagersAboutRoleRequest = async (address, roleName, programm
     const title = `RoleRequest in Grappa for ${programmeName}`
     const body = `A new role request for ${roleName} in ${programmeName} has been submitted to Grappa.\n
     You are receiving this message since you are marked as a manager of this programme, and you (or another manager
-    of the programme) should view and handle the request. You can find unhandled requests at https://grappa.cs.helsinki.fi/v2/PersonRoleManagement.\n\n
+    of the programme) should view and handle the request.
+    You can find unhandled requests at https://grappa.cs.helsinki.fi/v2/PersonRoleManagement.\n\n
     Best regards,\n
     Toska-group`
     try {

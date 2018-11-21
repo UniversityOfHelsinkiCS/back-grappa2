@@ -160,6 +160,7 @@ const updateGradingRow = async (trx, thesisRow, mainGraderId) => {
     const gradingRow = await trx('TARKASTUS')
         .where('GRADUTUNNUS', thesisRow.TUNNUS)
         .andWhere('VAIHE', 'gradu')
+        .first()
 
     if (!gradingRow) {
         const gradingId = await getIdFromSequence(trx, 'OTUNNUS')
