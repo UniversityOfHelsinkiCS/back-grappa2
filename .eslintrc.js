@@ -51,7 +51,7 @@ module.exports = {
         'no-plusplus': 'warn',
         'array-callback-return': 'warn',
         'guard-for-in': 'warn',
-        'import/prefer-default-export': 'warn',
+        'import/prefer-default-export': 'off',
         'no-nested-ternary': 'warn',
         'block-scoped-var': 'warn',
         complexity: ['off', 11],

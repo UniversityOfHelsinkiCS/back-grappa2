@@ -5,15 +5,14 @@ import { getAgreement } from './AgreementService'
 const knex = require('../db/connection').getKnex()
 const pdfManipulator = require('../util/pdfManipulator')
 const multer = require('multer')
-
-const PATH_TO_FOLDER = './uploads/'
+const { FILE_UPLOAD_PATH } = require('../constants')
 
 const storage = () => {
     if (process.env.NODE_ENV === 'test') {
         return multer.memoryStorage()
     }
     return multer.diskStorage({
-        destination: PATH_TO_FOLDER
+        destination: FILE_UPLOAD_PATH
     })
 }
 const upload = multer({ storage: storage() }).fields([
@@ -130,7 +129,7 @@ export async function updateAttachment(attachment) {
 }
 
 export async function getPdf(attachment, trim) {
-    return pdfManipulator.getPdf(PATH_TO_FOLDER, attachment, trim)
+    return pdfManipulator.getPdf(FILE_UPLOAD_PATH, attachment, trim)
 }
 
 export async function mergePdfs(...buffers) {

@@ -1,0 +1,11 @@
+node_modules
+coverage
+import
+.idea
+*.iml
+.nyc_output
+*.zip
+local-dev
+*.sqlite
+test
+uploads/*

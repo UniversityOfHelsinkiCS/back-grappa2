@@ -40,4 +40,6 @@ process.on('SIGTERM', () => {
     })
 })
 
+require('./src/scheduler')
+
 module.exports = app

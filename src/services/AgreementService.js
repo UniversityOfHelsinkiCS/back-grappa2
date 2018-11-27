@@ -21,7 +21,9 @@ const agreementSchema = [
     'whoNext'
 ]
 
-export const getAgreementById = agreementId => knex.select().from('agreement')
+const AGREEMENT_TABLE = 'agreement'
+
+export const getAgreementById = agreementId => knex.select().from(AGREEMENT_TABLE)
     .join('thesis', 'agreement.thesisId', '=', 'thesis.thesisId')
     .join('person', 'agreement.authorId', '=', 'person.personId')
     .join('studyfield', 'agreement.studyfieldId', '=', 'studyfield.studyfieldId')
@@ -29,64 +31,64 @@ export const getAgreementById = agreementId => knex.select().from('agreement')
     .where('agreementId', agreementId)
     .then(agreement => parseAgreementData(agreement[0]))
 
-export const getAgreementByIds = agreementIds => knex.select().from('agreement')
+export const getAgreementByIds = agreementIds => knex.select().from(AGREEMENT_TABLE)
     .join('thesis', 'agreement.thesisId', '=', 'thesis.thesisId')
     .join('studyfield', 'agreement.studyfieldId', '=', 'studyfield.studyfieldId')
     .join('programme', 'studyfield.programmeId', '=', 'programme.programmeId')
     .whereIn('agreementId', agreementIds)
 
-export const getAgreement = agreementId => knex.select().from('agreement').where('agreementId', agreementId)
+export const getAgreement = agreementId => knex.select().from(AGREEMENT_TABLE).where('agreementId', agreementId)
 
 export const getAgreementsInStudyfield = studyfieldId => knex.select()
-    .from('agreement')
+    .from(AGREEMENT_TABLE)
     .leftJoin('emailInvite', 'agreement.agreementId', 'emailInvite.agreement')
     .where('studyfieldId', studyfieldId)
 
 export const getAgreementsInProgramme = programmeId => knex.select()
-    .from('agreement')
+    .from(AGREEMENT_TABLE)
     .leftJoin('emailInvite', 'agreement.agreementId', 'emailInvite.agreement')
     .innerJoin('studyfield', 'agreement.studyfieldId', '=', 'studyfield.studyfieldId')
     .where('studyfield.programmeId', programmeId)
 
 export const getAgreementsByAgreementPerson = personId => knex
     .select(agreementSchema).distinct('agreement.agreementId')
-    .from('agreement')
+    .from(AGREEMENT_TABLE)
     .innerJoin('agreementPerson', 'agreement.agreementId', '=', 'agreementPerson.agreementId')
     .innerJoin('personWithRole', 'agreementPerson.personRoleId', '=', 'personWithRole.personRoleId')
     .where('personWithRole.personId', personId)
 
 export const getPreviousAgreementById = id => knex.select().from('previousagreements')
-    .join('agreement', 'previousagreements.previousAgreementId', '=', 'agreement.agreementId')
+    .join(AGREEMENT_TABLE, 'previousagreements.previousAgreementId', '=', 'agreement.agreementId')
     .where('previousagreements.agreementId', id)
     .then(agreement => agreement)
 
 export const getAllAgreements = () => knex.select()
-    .from('agreement')
+    .from(AGREEMENT_TABLE)
     .leftJoin('emailInvite', 'agreement.agreementId', 'emailInvite.agreement')
 
-export const getAgreementsByAuthor = personId => knex.select().from('agreement')
+export const getAgreementsByAuthor = personId => knex.select().from(AGREEMENT_TABLE)
     .where('authorId', personId)
 
-export const getAgreementsByThesisId = thesisId => knex.select().from('agreement')
+export const getAgreementsByThesisId = thesisId => knex.select().from(AGREEMENT_TABLE)
     .where('thesisId', thesisId)
 
 export const saveAgreement = async (agreement) => {
-    const agreementIds = await knex('agreement')
+    const agreementIds = await knex(AGREEMENT_TABLE)
         .returning('agreementId')
         .insert(agreement)
     const agreementId = agreementIds[0]
-    return knex.select(agreementSchema).from('agreement').where('agreementId', agreementId).first()
+    return knex.select(agreementSchema).from(AGREEMENT_TABLE).where('agreementId', agreementId).first()
 }
 
 export const saveAgreementTransactional = async (agreement, trx) => {
-    const agreementIds = await knex('agreement')
+    const agreementIds = await knex(AGREEMENT_TABLE)
         .returning('agreementId')
         .insert(agreement)
         .transacting(trx)
 
     const agreementId = agreementIds[0]
     return knex.select(agreementSchema)
-        .from('agreement')
+        .from(AGREEMENT_TABLE)
         .where('agreementId', agreementId)
         .transacting(trx)
         .first()
@@ -114,13 +116,13 @@ export const createFakeAgreement = (trx) => {
     return saveAgreementTransactional(fakeAgreement, trx)
 }
 
-export const updateAgreement = (agreement, trx) => knex('agreement')
+export const updateAgreement = (agreement, trx) => knex(AGREEMENT_TABLE)
     .returning('agreementId')
     .where('agreementId', '=', agreement.agreementId)
     .update(agreement)
     .transacting(trx)
     .then(() =>
-        knex.select(agreementSchema).from('agreement')
+        knex.select(agreementSchema).from(AGREEMENT_TABLE)
             .where('agreementId', '=', agreement.agreementId)
             .transacting(trx)
             .first()
@@ -138,7 +140,7 @@ export const savePrevious = data => knex('previousagreements')
     })
 
 export function linkAuthorToAgreement(agreementId, authorId) {
-    return knex('agreement').update({ authorId }).where('agreementId', agreementId)
+    return knex(AGREEMENT_TABLE).update({ authorId }).where('agreementId', agreementId)
 }
 
 // change data formatting from DB to front
@@ -181,7 +183,7 @@ in the agreement approval process we are at.
 // REDO THIS LATER
 export const getAgreementReceiver = (id) => {
     logger.info('getAgreementReceiver', { id })
-    return knex.select('whoNext').from('agreement')
+    return knex.select('whoNext').from(AGREEMENT_TABLE)
         .where('agreementId', id)
         .then((agreement) => {
             logger.debug('whoNext', { whoNext: agreement[0].whoNext })
@@ -207,7 +209,7 @@ export const getThesesGradersAuthorsForAgreements = (agreementIds) => {
         'author.lastname as authorLastname'
     ]
 
-    return knex.select(informationSchema).from('agreement')
+    return knex.select(informationSchema).from(AGREEMENT_TABLE)
         .whereIn('agreement.agreementId', agreementIds)
         .innerJoin('agreementPerson', 'agreement.agreementId', '=', 'agreementPerson.agreementId')
         .innerJoin('personWithRole', 'agreementPerson.personRoleId', '=', 'personWithRole.personRoleId')
@@ -220,3 +222,29 @@ export const getThesesGradersAuthorsForAgreements = (agreementIds) => {
             'agreementPerson.approverId', '=', 'graderReviewerRole.personRoleId')
         .leftJoin('person as graderReviewer', 'graderReviewerRole.personId', '=', 'graderReviewer.personId')
 }
+
+export const getThesisMetadataByIds = async (thesisIds) => {
+    const informationSchema = [
+        'agreement.thesisId as thesisId',
+        'author.firstname as firstname',
+        'author.lastname as lastname',
+        'studyfield.name as studyfield',
+        'programme.name as programme',
+        'faculty.name as faculty',
+        'attachment.originalname as filename'
+    ]
+
+    return knex(AGREEMENT_TABLE)
+        .whereIn('agreement.thesisId', thesisIds)
+        .andWhere('attachment.label', 'thesisFile')
+        .innerJoin('person as author', 'agreement.authorId', '=', 'author.personId')
+        .innerJoin('studyfield', 'agreement.studyfieldId', '=', 'studyfield.studyfieldId')
+        .innerJoin('programme', 'studyfield.programmeId', '=', 'programme.programmeId')
+        .innerJoin('faculty', 'programme.facultyId', '=', 'faculty.facultyId')
+        .innerJoin('attachment', 'agreement.agreementId', '=', 'attachment.agreementId')
+        .select(informationSchema)
+}
+
+export const updateStudyModuleRegistration = (agreementId, requestStudyModuleRegistration) => knex('agreement')
+    .update({ requestStudyModuleRegistration })
+    .where({ agreementId })
