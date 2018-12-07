@@ -1,3 +1,4 @@
+const Promise = require('bluebird')
 const knex = require('../db/connection').getKnex()
 
 module.exports.getStudyfields = function () {

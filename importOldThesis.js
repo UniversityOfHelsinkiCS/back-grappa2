@@ -37,7 +37,9 @@ async function run() {
     const content = await Promise.promisify(fs.readFile)('import/gradut.csv', 'utf-8')
     const theses = content.split('\n').slice(1)
 
-    theses.forEach(thesis => saveThesis(thesis, studyfields))
+    // theses.forEach(thesis => saveThesis(thesis, studyfields))
+    await Promise.each(theses, thesis => saveThesis(thesis, studyfields))
+    console.log('complete')
 }
 
 async function saveThesis(thesisRow, studyfields) {
