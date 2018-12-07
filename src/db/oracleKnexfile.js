@@ -1,10 +1,12 @@
 const config = require('../util/config')
 
+
 module.exports = {
     client: 'oracledb',
     connection: {
-        connectString: config.ORACLE_CONNCETION_STRING,
+        host: config.ORACLE_DATABASE_URL,
         user: config.ORACLE_DATABASE_USER,
-        password: config.ORACLE_DATABASE_PASSWORD
+        password: config.ORACLE_DATABASE_PASSWORD,
+        database: config.ORACLE_DATABASE_SERVICE
     }
 }
