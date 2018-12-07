@@ -168,7 +168,7 @@ const updateGradingRow = async (trx, thesisRow, mainGraderId) => {
         await trx('TARKASTUS')
             .insert({
                 TTUNNUS: gradingId[0].NEXTVAL,
-                GRADUTUNNUS: thesisRow.GRADUTUNNUS,
+                GRADUTUNNUS: thesisRow.TUNNUS,
                 KIRJAAJA: mainGraderId,
                 VAIHE: 'gradu',
                 JATETTY_PVM: new Date(),
