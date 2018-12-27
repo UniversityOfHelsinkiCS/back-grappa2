@@ -30,6 +30,7 @@ const flattenThesesMetadata = metadata => metadata.reduce((acc, cur) => {
 }, {})
 
 const checkAndUploadPendingTheses = async () => {
+    logger.info('Starting thesis upload.')
     const theses = await thesisService.getPendingEthesisUploads()
     const thesesIds = theses.map(t => t.thesisId)
     const thesesMetadata = await agreementService.getThesisMetadataByIds(thesesIds)
@@ -48,6 +49,7 @@ const checkAndUploadPendingTheses = async () => {
             await thesisService.setSentToEthesis(thesisId)
         } catch (err) {
             logger.error(`Sending thesis with filename ${filename} to ethesis failed.`)
+            logger.error(err.message)
         }
     }))
 }
