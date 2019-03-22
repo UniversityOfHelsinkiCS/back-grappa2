@@ -231,7 +231,8 @@ export const getThesisMetadataByIds = async (thesisIds) => {
         'studyfield.name as studyfield',
         'programme.name as programme',
         'faculty.name as faculty',
-        'attachment.originalname as filename'
+        'attachment.originalname as filename',
+        'attachment.filename as nameInFilesystem'
     ]
 
     return knex(AGREEMENT_TABLE)

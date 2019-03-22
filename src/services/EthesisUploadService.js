@@ -55,8 +55,8 @@ const checkAndUploadPendingTheses = async () => {
 }
 
 const sendThesisToEthesis = async (metadata) => {
-    const { filename } = metadata
-    const thesisPdf = await fs.readFileSync(`${FILE_UPLOAD_PATH}${filename}`)
+    const { filename, nameInFilesystem } = metadata
+    const thesisPdf = await fs.readFileSync(`${FILE_UPLOAD_PATH}${nameInFilesystem}`)
     const metadataXml = await ethesisMetadataService.generateMetadataXml(metadata)
     const metadataFilename = 'mets.xml'
 
