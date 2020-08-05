@@ -37,7 +37,7 @@
     "cors": "^2.8.5",
     "dotenv": "^5.0.1",
     "express": "^4.16.4",
-    "express-fileupload": "^1.0.0",
+    "express-fileupload": "^1.1.9",
     "express-graceful-exit": "^0.4.2",
     "form-data": "^2.3.3",
     "jsonwebtoken": "^8.3.0",
